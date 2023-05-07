@@ -21,3 +21,18 @@ class TestShopPage:
         cnt = page.get_product_tocart_quantity(product_obj)
         page.click_product_increment_button(product_obj)
         assert page.get_product_tocart_quantity(product_obj) == cnt + 1
+
+    def test_product_count_decrement_btn(self, browser):
+        """
+        Check if the "minus" button decrements the count inside the product block
+        :param browser: webdriver
+        :return: None
+        """
+        page = ShopPage(browser)
+        product_obj = page.get_product_dom_element(0)
+        assert product_obj is not None
+        page.click_product_increment_button(product_obj)
+        cnt = page.get_product_tocart_quantity(product_obj)
+        page.click_product_decrement_button(product_obj)
+        assert page.get_product_tocart_quantity(product_obj) == cnt - 1
+        

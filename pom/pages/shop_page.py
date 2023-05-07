@@ -22,10 +22,9 @@ class ShopPage:
 
     def __init__(self, browser):
         self._browser = browser
-        self._browser.implicitly_wait(3)
+        self._browser.implicitly_wait(10)
         self._browser.get(self._page_url)
         WebDriverWait(self._browser, 20).until(EC.presence_of_element_located(self._page_loaded_element))
-        #WebDriverWait(self._browser, timeout=20).until(EC.document_initialised)
 
     def get_product_dom_element(self, index=0):
         """

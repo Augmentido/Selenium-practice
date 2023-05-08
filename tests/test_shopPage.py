@@ -1,4 +1,6 @@
 """ tests for home page """
+import random
+
 from pytest import mark
 from pom.pages.shop_page import ShopPage
 import time
@@ -17,11 +19,11 @@ class TestShopPage:
         """
 
         page = ShopPage(browser)
-        product_obj = page.get_product_dom_element(0)
-        assert product_obj is not None
-        cnt = page.get_product_tocart_quantity(product_obj)
-        page.click_product_increment_button(product_obj)
-        assert page.get_product_tocart_quantity(product_obj) == cnt + 1
+        product = page.get_product(0)
+        assert product is not None
+        cnt = product.get_tocart_quantity()
+        product.click_increment_button()
+        assert product.get_tocart_quantity() == cnt + 1
 
     def test_product_count_decrement_btn(self, browser):
         """
@@ -30,12 +32,12 @@ class TestShopPage:
         :return: None
         """
         page = ShopPage(browser)
-        product_obj = page.get_product_dom_element(0)
-        assert product_obj is not None
-        page.click_product_increment_button(product_obj)
-        cnt = page.get_product_tocart_quantity(product_obj)
-        page.click_product_decrement_button(product_obj)
-        assert page.get_product_tocart_quantity(product_obj) == cnt - 1
+        product = page.get_product(0)
+        assert product is not None
+        product.click_increment_button()
+        cnt = product.get_tocart_quantity()
+        product.click_decrement_button()
+        assert product.get_tocart_quantity() == cnt - 1
 
     def test_product_search(self, browser):
         """
@@ -67,9 +69,14 @@ class TestShopPage:
         :param browser: webdriver
         :return: None
         """
-        # add to cart
-        #TODO
-        pass
+        page = ShopPage(browser)
+        products = page.get_products() # getting all products DOM elements
+        assert len(products) > 0
+        product1 = random.randint(0, len(products)-1)
+        product2 = random.randint(0, len(products)-1)
+        if product1 == product2:
+            return self.test_add_to_cart(browser)
+        pass #TODO
 
     def test_remove_from_cart(self, browser):
         """

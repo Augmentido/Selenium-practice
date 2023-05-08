@@ -2,6 +2,8 @@
 import random
 
 from pytest import mark
+from selenium.webdriver import ActionChains
+
 from pom.pages.shop_page import ShopPage
 import time
 
@@ -72,11 +74,31 @@ class TestShopPage:
         page = ShopPage(browser)
         products = page.get_products() # getting all products DOM elements
         assert len(products) > 0
+
+        # get 2 random different products to work with
         product1 = random.randint(0, len(products)-1)
         product2 = random.randint(0, len(products)-1)
         if product1 == product2:
             return self.test_add_to_cart(browser)
-        pass #TODO
+        product1 = products[product1]
+        product2 = products[product2]
+
+        # first one just add to cart
+        ActionChains(browser).move_to_element(product1.get_dom_element()).perform()
+        time.sleep(1)
+        product1.click_addtocart_button()
+        time.sleep(1)
+
+        # second - increment and add to cart
+        ActionChains(browser).move_to_element(product2.get_dom_element()).perform()
+        time.sleep(1)
+        product2.click_increment_button()
+        product2.click_addtocart_button()
+        time.sleep(1)
+
+        cart = page.get_minicart()
+        assert product1.is_in_cart(cart, 1)
+        assert product2.is_in_cart(cart, 2)
 
     def test_remove_from_cart(self, browser):
         """

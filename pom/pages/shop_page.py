@@ -6,6 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from pom.pages.shop_product import ShopProduct
+from pom.pages.shop_minicart import ShopMinicartProduct
 #from selenium.webdriver.support.wait import WebDriverWait
 
 
@@ -25,6 +26,10 @@ class ShopPage:
     _search_input = (By.CSS_SELECTOR, "input[type=\"search\"]")
     _search_button = (By.CSS_SELECTOR, "button[type=\"submit\"]")
 
+    # cart related selectors
+    _cart = (By.CSS_SELECTOR, ".cart-preview ul.cart-items")
+    _cart_item = (By.CSS_SELECTOR, "li.cart-item")
+
     def __init__(self, browser):
         self._browser = browser
         self._browser.implicitly_wait(10)
@@ -38,10 +43,10 @@ class ShopPage:
         """
 
         els = self._browser.find_elements(self._product_locator[0], self._product_locator[1])
-        list = []
+        ls = []
         for el in els:
-            list.append(ShopProduct(self, self._browser, el))
-        return list if len(list) > 0 else None
+            ls.append(ShopProduct(el))
+        return ls if len(ls) > 0 else None
 
     def get_product(self, index=0):
         """
@@ -91,3 +96,18 @@ class ShopPage:
         for product in products:
             names_list.append(product.get_name())
         return names_list
+
+    def get_minicart(self):
+        """
+        Finds and returns a list of ShopMinicart elements
+        :return: ShopMinicartProduct[]
+        """
+
+        el = self._browser.find_element(self._cart[0], self._cart[1])
+        if el is None:
+            return None
+        els = el.find_elements(self._cart_item[0], self._cart_item[1])
+        li = []
+        for el in els:
+            li.append(ShopMinicartProduct(self._browser, el))
+        return li if len(li) > 0 else None

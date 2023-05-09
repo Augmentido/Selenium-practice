@@ -1,13 +1,17 @@
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 
 class ShopMinicartProduct:
     _dom_element = None
 
-    # cart related selectors
+    # cart product related selectors
     _name = (By.CSS_SELECTOR, ".product-info .product-name")
     _price = (By.CSS_SELECTOR, ".product-info .product-price")
     _count = (By.CSS_SELECTOR, ".product-total .quantity")
+    _remove = (By.CSS_SELECTOR, ".product-remove")
+    _minicart_show_btn = (By.CSS_SELECTOR, "header .cart-icon")
 
     def __init__(self, webdriver, element):
         self._dom_element = element
@@ -46,3 +50,12 @@ class ShopMinicartProduct:
             self._dom_element.find_element(self._count[0], self._count[1])
         )
 
+    def remove(self):
+        """
+        Remove this item from minicart
+        :return: None
+        """
+        if not self._dom_element.is_displayed():
+            self._browser.find_element(self._minicart_show_btn[0], self._minicart_show_btn[1]).click()
+        WebDriverWait(self._browser, 3).until(EC.visibility_of(self._dom_element))
+        self._dom_element.find_element(self._remove[0], self._remove[1]).click()

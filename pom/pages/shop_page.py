@@ -7,11 +7,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from pom.pages.shop_product import ShopProduct
 from pom.pages.shop_minicart import ShopMinicartProduct
-#from selenium.webdriver.support.wait import WebDriverWait
+
+
+# from selenium.webdriver.support.wait import WebDriverWait
 
 
 class ShopPage:
-
     _page_url = "https://rahulshettyacademy.com/seleniumPractise/"
     _browser = None
 
@@ -32,7 +33,7 @@ class ShopPage:
 
     def __init__(self, browser):
         self._browser = browser
-        self._browser.implicitly_wait(10)
+        self._browser.implicitly_wait(8)
         self._browser.get(self._page_url)
         WebDriverWait(self._browser, 20).until(EC.presence_of_element_located(self._page_loaded_element))
 
@@ -102,8 +103,11 @@ class ShopPage:
         Finds and returns a list of ShopMinicart elements
         :return: ShopMinicartProduct[]
         """
+        try:
+            el = self._browser.find_element(self._cart[0], self._cart[1])
+        except:
+            el = None
 
-        el = self._browser.find_element(self._cart[0], self._cart[1])
         if el is None:
             return None
         els = el.find_elements(self._cart_item[0], self._cart_item[1])

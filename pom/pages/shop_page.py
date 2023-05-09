@@ -7,6 +7,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from pom.pages.shop_product import ShopProduct
 from pom.pages.shop_minicart import ShopMinicartProduct
+from selenium.webdriver import ActionChains
+import random
 
 
 # from selenium.webdriver.support.wait import WebDriverWait
@@ -31,8 +33,15 @@ class ShopPage:
     _cart = (By.CSS_SELECTOR, ".cart-preview ul.cart-items")
     _cart_item = (By.CSS_SELECTOR, "li.cart-item")
 
-    def __init__(self, browser):
+    def __init__(self, browser, init_page=True):
+        """
+
+        :param browser: webdriver
+        :param init_page: wherever to do basic page initialization or no
+        """
         self._browser = browser
+        if not init_page:
+            return
         self._browser.implicitly_wait(8)
         self._browser.get(self._page_url)
         WebDriverWait(self._browser, 20).until(EC.presence_of_element_located(self._page_loaded_element))
@@ -115,3 +124,37 @@ class ShopPage:
         for el in els:
             li.append(ShopMinicartProduct(self._browser, el))
         return li if len(li) > 0 else None
+
+    def add_to_cart_script(self):
+        """
+        Script for use in tests. Finds two random products,
+        adds to cart one item of first one and two items of second one.
+        Returns added products
+        :return: (product1, product2)
+        """
+        products = self.get_products() # getting all products
+        assert len(products) > 1
+
+        # get 2 random different products to work with
+        product1 = random.randint(0, len(products)-1)
+        product2 = random.randint(0, len(products)-1)
+        # we need two different products. If we got the same product - let`s try one more time
+        if product1 == product2:
+            return self.add_to_cart_script()
+        product1 = products[product1]
+        product2 = products[product2]
+
+        # first one just add to cart
+        ActionChains(self._browser).move_to_element(product1.get_dom_element()).perform()
+        time.sleep(1)
+        product1.click_addtocart_button()
+        time.sleep(1)
+
+        # second - increment and add to cart
+        ActionChains(self._browser).move_to_element(product2.get_dom_element()).perform()
+        time.sleep(1)
+        product2.click_increment_button()
+        product2.click_addtocart_button()
+        time.sleep(1)
+
+        return product1, product2

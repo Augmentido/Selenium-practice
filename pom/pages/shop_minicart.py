@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+import time
 
 
 class ShopMinicartProduct:
@@ -12,6 +13,9 @@ class ShopMinicartProduct:
     _count = (By.CSS_SELECTOR, ".product-total .quantity")
     _remove = (By.CSS_SELECTOR, ".product-remove")
     _minicart_show_btn = (By.CSS_SELECTOR, "header .cart-icon")
+    _checkout_btn = (By.CSS_SELECTOR, ".action-block button")
+
+    _checkout_page_signal_element = (By.CSS_SELECTOR, ".productCartTables")
 
     def __init__(self, webdriver, element):
         self._dom_element = element
@@ -59,3 +63,20 @@ class ShopMinicartProduct:
             self._browser.find_element(self._minicart_show_btn[0], self._minicart_show_btn[1]).click()
         WebDriverWait(self._browser, 3).until(EC.visibility_of(self._dom_element))
         self._dom_element.find_element(self._remove[0], self._remove[1]).click()
+
+    def go_to_checkout(self):
+        """
+        Performs actions needed to get to checkout page.
+        Cart must be not empty
+        :return:
+        """
+        if not self._dom_element.is_displayed():
+            self._browser.find_element(self._minicart_show_btn[0], self._minicart_show_btn[1]).click()
+        checkout_btn = self._browser.find_element(self._checkout_btn[0], self._checkout_btn[1])
+        WebDriverWait(self._browser, 3).until(EC.visibility_of(checkout_btn))
+        checkout_btn.click()
+
+        time.sleep(3)
+        #WebDriverWait(self._browser, 10).until(EC.presence_of_element_located(
+        #    self._checkout_page_signal_element
+        #))

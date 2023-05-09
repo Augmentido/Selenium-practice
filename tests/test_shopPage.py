@@ -1,8 +1,5 @@
-""" tests for home page """
-import random
+""" tests for shop page """
 from pytest import mark
-from selenium.webdriver import ActionChains
-from selenium import webdriver
 from pom.pages.shop_page import ShopPage
 import time
 
@@ -67,42 +64,6 @@ class TestShopPage:
         for name in names:
             assert "ca" in name.lower()
 
-    def add_to_cart_script(self, page: ShopPage, browser: webdriver):
-        """
-        Script for use in tests. Finds two random products,
-        adds to cart one item of first one and two items of second one.
-        Returns added products
-        :param page: ShopPage
-        :param browser: webdriver
-        :return: (product1, product2)
-        """
-        products = page.get_products() # getting all products
-        assert len(products) > 1
-
-        # get 2 random different products to work with
-        product1 = random.randint(0, len(products)-1)
-        product2 = random.randint(0, len(products)-1)
-        # we need two different products. If we got the same product - let`s try one more time
-        if product1 == product2:
-            return self.add_to_cart_script(page, browser)
-        product1 = products[product1]
-        product2 = products[product2]
-
-        # first one just add to cart
-        ActionChains(browser).move_to_element(product1.get_dom_element()).perform()
-        time.sleep(1)
-        product1.click_addtocart_button()
-        time.sleep(1)
-
-        # second - increment and add to cart
-        ActionChains(browser).move_to_element(product2.get_dom_element()).perform()
-        time.sleep(1)
-        product2.click_increment_button()
-        product2.click_addtocart_button()
-        time.sleep(1)
-
-        return product1, product2
-
     def test_add_to_cart(self, browser):
         """
         Check if add to cart in product block works properly
@@ -110,7 +71,7 @@ class TestShopPage:
         :return: None
         """
         page = ShopPage(browser)
-        selected_products = self.add_to_cart_script(page, browser)
+        selected_products = page.add_to_cart_script()
         cart = page.get_minicart()
         assert selected_products[0].is_in_cart(cart, 1)
         assert selected_products[1].is_in_cart(cart, 2)
@@ -124,7 +85,7 @@ class TestShopPage:
         page = ShopPage(browser)
 
         # add something to cart
-        selected_products = self.add_to_cart_script(page, browser)
+        selected_products = page.add_to_cart_script()
         cart = page.get_minicart()
         assert selected_products[0].is_in_cart(cart, 1)
         assert selected_products[1].is_in_cart(cart, 2)
@@ -137,13 +98,3 @@ class TestShopPage:
         time.sleep(1)
         cart = page.get_minicart()
         assert cart is None
-
-
-
-
-
-# to checkout
-# check totals in checkout
-# place order
-# select country and checkbox
-# get "order placed" message

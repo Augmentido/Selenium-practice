@@ -6,6 +6,8 @@ from selenium import webdriver
 from pom.pages.checkout_page import CheckoutPage
 import time
 
+from pom.pages.place_order_page import PlaceOrderPage
+
 
 @mark.functional
 @mark.checkout
@@ -22,7 +24,9 @@ class TestCheckoutPage:
         totals = page.get_totals()
         assert totals["amount"] == total
 
-
-# place order
-# select country and checkbox
-# get "order placed" message
+    def test_place_order(self, browser):
+        page = CheckoutPage(browser)
+        page.click_place_order_button()
+        po_page = PlaceOrderPage(browser)
+        po_page.select_country('Malta')
+        po_page.click_agree_checkbox()

@@ -33,6 +33,9 @@ class CheckoutPage:
     _total_discount = (By.CSS_SELECTOR, ".discountPerc")
     _total_amount_after_discount = (By.CSS_SELECTOR, ".discountAmt")
 
+    _place_order_button = (By.CSS_SELECTOR, ".products>div button:not(.promoBtn)")
+    _country_select_page_indicator = (By.CSS_SELECTOR, "#root input.chkAgree")
+
     def __init__(self, browser):
         self._browser = browser
         self._browser.implicitly_wait(8)
@@ -72,3 +75,14 @@ class CheckoutPage:
             "discount": totals_block.find_element(self._total_discount[0], self._total_discount[1]).text,
             "amount_after_discount": float(totals_block.find_element(self._total_amount_after_discount[0], self._total_amount_after_discount[1]).text),
         }
+
+    def click_place_order_button(self):
+        """
+        Clicks on "Place order" button
+        :return: None
+        """
+        po_button = self._browser.find_element(self._place_order_button[0], self._place_order_button[1])
+        po_button.click()
+        WebDriverWait(self._browser, 10).until(EC.presence_of_element_located(
+           self._country_select_page_indicator
+        ))
